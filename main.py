@@ -5,12 +5,12 @@ from typing import Annotated, Optional
 import secrets
 
 
-from fastapi import FastAPI, Depends, HttpException, status
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-from sqlalchemy import UniqueCOnstraint
+from sqlalchemy import UniqueConstraint
 
 
 SECRET_KEY = "2bab70a280371c284b0c265e978fc6063c2b8b5e9d5cd97f2828e7867534a833"
