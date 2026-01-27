@@ -2,7 +2,7 @@
 #USING FASTAPI TO CREATE A LOGIN API
 
 from fastapi import FastAPI
-import uvicorn
+
 app = FastAPI()
 
 @app.get("/")
