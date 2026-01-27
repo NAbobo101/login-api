@@ -1,15 +1,39 @@
 # PYTHON CHALLENGE - 001 FastAPI
 #USING FASTAPI TO CREATE A LOGIN API
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Form, Depends, status, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str
+from typing import Annotated
+import secrets
+
 
 app = FastAPI()
 
+security = HTTPBasic()
 
-@app.post("/login")
-async def create_login(request: LoginRequest):
-    return request.username + request.password
+def get_current_username(
+        credentials: Annotated[HTTPBasicCredentials, Depends(security)],
+):
+    current_username_bytes = credentials.username.encode("utf8")
+    correct_username_bytes = b"teste"
+    is_correct_username = secrets.compare_digest(
+        current_username_bytes, correct_username_bytes
+    )
+    current_password_bytes = credentials.password.encode("utf8")
+    correct_password_bytes = b"teste123"
+    is_correct_password = secrets.compare_digest(
+        current_password_bytes, correct_password_bytes
+    )
+    if not (is_correct_username and is_correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+
+@app.get("/login")
+def read_current_user(username: Annotated[str, Depends(get_current_username)]):
+    return {"message": f"Welcome, {username}!"}
+
