@@ -124,5 +124,22 @@ def register_user(user_in: UserCreate, session: SessionDep):
     return user
 
 @app.post("/token")
+def login_for_acess_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: SessionDep,
+):
+    user = authenticate_user(session, form_data.username, form_data.password)
+    if not user:
+        raise HttpException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username or Password incorrect (Usuário ou senha incorretos)",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = create_acess_token(subject=user.username)
+    return Token(acess_token=token)
+
+@app.get("/me", response_model=UserRead)
+def read_me(current_user: Annotated[User, Depends(get_current_user)]):
+    return current_user
 
 
