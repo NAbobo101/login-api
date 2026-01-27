@@ -5,10 +5,25 @@ from typing import Annotated
 
 from fastapi import FastAPI, Form, Depends, status, HTTPException, Query
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-
+import bcrypt
+import uuid
+from jose import jwt
+from db.config import 
 
 app = FastAPI()
+
+# add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+        allow_origins=["localhost", "http://localhost:3000"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+app.include_router(user_router, prefix="/api")
 
 security = HTTPBasic()
 
